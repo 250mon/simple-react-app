@@ -77,6 +77,8 @@ const Create = (props) => {
 };
 
 const Update = (props) => {
+  const [title, setTitle] = useState(props.title);
+  const [body, setBody] = useState(props.body);
   return (
     <article>
       <h2>Update</h2>
@@ -89,10 +91,25 @@ const Update = (props) => {
         }}
       >
         <p>
-          <input type="text" name="title" placeholder="title"></input>
+          <input
+            type="text"
+            name="title"
+            placeholder="title"
+            value={title}
+            onChange={(event) => {
+              setTitle(event.target.value);
+            }}
+          ></input>
         </p>
         <p>
-          <textarea name="body" placeholder="body"></textarea>
+          <textarea
+            name="body"
+            placeholder="body"
+            value={body}
+            onChange={(event) => {
+              setBody(event.target.value);
+            }}
+          ></textarea>
         </p>
         <p>
           <input type="submit" value="Update"></input>
@@ -127,17 +144,27 @@ function App() {
     }
     content = <Article title={title} body={body} />;
     contextControl = (
-      <li>
-        <a
-          href={"/update" + id}
-          onClick={(event) => {
-            event.defaultPrevented();
-            setMode("Update");
-          }}
-        >
-          Update
-        </a>
-      </li>
+      <>
+        <li>
+          <a
+            href={"/update/" + id}
+            onClick={(event) => {
+              event.preventDefault();
+              setMode("Update");
+            }}
+          >
+            Update
+          </a>
+        </li>
+        <li>
+          <a href={"/delete_process" + id} onClick={(event) => {
+            event.preventDefault();
+            const new_topics = topics.filter((topic) => topic.id != id);
+            setTopics(new_topics);
+            setMode("welcome");
+          }}>Delete</a>
+        </li>
+      </>
     );
   } else if (mode === "Create") {
     content = (
@@ -155,18 +182,28 @@ function App() {
       />
     );
   } else if (mode === "Update") {
+    let title,
+      body = null;
+    for (let i = 0; i < topics.length; i++) {
+      if (topics[i].id === id) {
+        title = topics[i].title;
+        body = topics[i].body;
+        break;
+      }
+    }
     content = (
       <Update
+        title={title}
+        body={body}
         onUpdate={(title, body) => {
-          const new_topics = [...topics];
-          for (let i = 0; i < new_topics.length; i++) {
-            if (new_topics[i].id === id) {
-              new_topics[i].title = title;
-              new_topics[i].body = body;
-              break;
+          const updatedTopics = topics.map((topic) => {
+            if (topic.id === id) {
+              return { id: id, title: title, body: body };
+            } else {
+              return topic;
             }
-          }
-          setTopics(new_topics);
+          });
+          setTopics(updatedTopics);
           setMode("Read");
         }}
       />
