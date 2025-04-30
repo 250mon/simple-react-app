@@ -26,12 +26,7 @@ function useTopics() {
     setTopics(topics.filter((topic) => topic.id !== id));
   };
 
-  return {
-    topics,
-    addTopic,
-    updateTopic,
-    deleteTopic,
-  };
+  return [topics, addTopic, updateTopic, deleteTopic];
 }
 
 export default useTopics;
